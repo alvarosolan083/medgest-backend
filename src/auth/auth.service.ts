@@ -1,26 +1,65 @@
 // ✅ src/auth/auth.service.ts
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import {
+  Injectable,
+  UnauthorizedException,
+  BadRequestException, // <-- ¡Ahora sí, agregada aquí!
+} from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { PrismaClient } from '@prisma/client';
+import { PrismaService } from '../common/prisma.service';
 
-const prisma = new PrismaClient();
+import * as bcrypt from 'bcrypt'; // <-- ¡Ahora sí, agregada aquí!
+import { CreateUserDto } from './dto/create-user.dto'; // <-- ¡Ahora sí, agregada aquí!
 
 @Injectable()
 export class AuthService {
-  constructor(private jwtService: JwtService) {}
+  constructor(
+    private jwtService: JwtService,
+    private prisma: PrismaService,
+  ) {}
 
   async validateUser(email: string, password: string) {
-    const user = await prisma.user.findUnique({ where: { email } });
-    if (!user || user.password !== password) {
+    const user = await this.prisma.user.findUnique({ where: { email } });
+
+    if (!user) {
       throw new UnauthorizedException('Credenciales inválidas');
     }
+
+    const isPasswordValid = await bcrypt.compare(password, user.password);
+    if (!isPasswordValid) {
+      throw new UnauthorizedException('Credenciales inválidas');
+    }
+
     return user;
   }
 
   async login(user: any) {
-    const payload = { sub: user.id, email: user.email, role: user.role };
+    const payload = { sub: user.id, email: user.email, role: user.role?.name || user.role };
     return {
       access_token: this.jwtService.sign(payload),
     };
+  }
+
+  async register(createUserDto: CreateUserDto) {
+    const existing = await this.prisma.user.findUnique({
+      where: { email: createUserDto.email },
+    });
+
+    if (existing) {
+      throw new BadRequestException('El correo ya está registrado');
+    }
+
+    const hashedPassword = await bcrypt.hash(createUserDto.password, 10);
+    const newUser = await this.prisma.user.create({
+      data: {
+        name: createUserDto.name,
+        email: createUserDto.email,
+        password: hashedPassword,
+        role: {
+          connect: { name: 'admin' },
+        },
+      },
+    });
+
+    return { message: 'Usuario creado exitosamente', userId: newUser.id };
   }
 }
