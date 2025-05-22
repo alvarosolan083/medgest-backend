@@ -1,9 +1,8 @@
-// src/main.ts
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
 import * as dotenv from 'dotenv';
-import { PrismaService } from './common/prisma.service';
+import { PrismaService } from '../prisma/prisma.service'; // ✅ Import correcto
 
 async function bootstrap() {
   dotenv.config();
@@ -11,19 +10,16 @@ async function bootstrap() {
 
   // --- Configuración de CORS más explícita ---
   app.enableCors({
-    origin: 'https://medgest-frontend.vercel.app', // ¡Reemplaza con la URL EXACTA de tu frontend!
-    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE', // Permite todos los métodos comunes
-    credentials: true, // Importante si usas cookies o tokens de autorización con credenciales
+    origin: 'https://medgest-frontend.vercel.app',
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+    credentials: true,
   });
-  // ------------------------------------------
 
   app.useGlobalPipes(new ValidationPipe());
 
   // --- Lógica para el shutdown hook de Prisma ---
   const prismaService = app.get(PrismaService);
-  (prismaService as any).$on('beforeExit', async () => {
-    await app.close();
-  });
+  await prismaService.enableShutdownHooks(app); // ✅ Sin 'as any'
   // ----------------------------------------------------------------
 
   const port = process.env.PORT || 3000;
