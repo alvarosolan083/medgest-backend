@@ -1,5 +1,3 @@
-/// <reference types="multer" />
-
 import {
   Controller,
   Post,
@@ -12,10 +10,10 @@ import { FileInterceptor } from '@nestjs/platform-express';
 export class UploadsController {
   @Post()
   @UseInterceptors(FileInterceptor('file'))
-  uploadFile(@UploadedFile() file: Express.Multer.File) {
+  uploadFile(@UploadedFile() file: any) {
     return {
-      filename: file.originalname,
-      size: file.size,
+      filename: file?.originalname,
+      size: file?.size,
     };
   }
 }
