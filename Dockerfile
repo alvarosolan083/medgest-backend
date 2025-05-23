@@ -1,40 +1,40 @@
-# Dockerfile
-
-# Stage 1: Build the NestJS application
+# --------- Stage 1: Build the NestJS application ---------
 FROM node:18-alpine AS build
 
-# Set the working directory inside the container
 WORKDIR /app
 
-# Copy package.json and package-lock.json to install dependencies
+# Copiar dependencias y lock file
 COPY package*.json ./
 
-# Install dependencies
+# Instalar dependencias
 RUN npm ci
 
-# ******* NUEVO PASO: Instalar NestJS CLI globalmente en la etapa de build *******
+# Instalar NestJS CLI (necesario para 'nest build')
 RUN npm install -g @nestjs/cli
 
-# Copy the rest of the application source code
+# Copiar el resto del código fuente
 COPY . .
 
-# Generate Prisma Client
+# Generar Prisma Client
 RUN npx prisma generate
 
-# Build the NestJS application (now 'nest' should definitely be found)
+# Compilar la aplicación
 RUN nest build
 
 
-# Stage 2: Run the production application
+# --------- Stage 2: Run the production application ---------
 FROM node:18-alpine AS production
 
 WORKDIR /app
 
+# Copiar solo lo necesario
 COPY --from=build /app/node_modules ./node_modules
 COPY --from=build /app/dist ./dist
 COPY --from=build /app/prisma ./prisma
 COPY package.json ./
 
+# Exponer puerto
 EXPOSE 3000
 
-CMD [ "npm", "run", "start:prod" ]
+# Comando final
+CMD ["npm", "run", "start:prod"]

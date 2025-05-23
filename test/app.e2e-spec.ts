@@ -1,7 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { INestApplication } from '@nestjs/common';
-import * as request from 'supertest';
-import { AppModule } from './../src/app.module';
+import request from 'supertest'; // ✅ Import corregido
+import { AppModule } from '../src/app.module'; // ✅ Ruta también corregida si aplica
 
 describe('AppController (e2e)', () => {
   let app: INestApplication;

@@ -1,6 +1,7 @@
 // src/billing/billing.service.ts
 import { Injectable } from '@nestjs/common';
-import { PrismaService } from '../common/prisma.service';
+import { PrismaService } from '../../prisma/prisma.service';
+
 import { CreateBillingDto, UpdateBillingDto } from './billing.dto';
 
 @Injectable()

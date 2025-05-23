@@ -1,14 +1,13 @@
-// ✅ src/auth/auth.service.ts
 import {
   Injectable,
   UnauthorizedException,
-  BadRequestException, // <-- ¡Ahora sí, agregada aquí!
+  BadRequestException,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { PrismaService } from '../common/prisma.service';
+import { PrismaService } from '../../prisma/prisma.service';
 
-import * as bcrypt from 'bcrypt'; // <-- ¡Ahora sí, agregada aquí!
-import { CreateUserDto } from './dto/create-user.dto'; // <-- ¡Ahora sí, agregada aquí!
+import * as bcrypt from 'bcrypt';
+import { CreateUserDto } from './dto/create-user.dto';
 
 @Injectable()
 export class AuthService {
