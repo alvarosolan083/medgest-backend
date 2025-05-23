@@ -10,7 +10,7 @@ import { AppointmentsModule } from './appointments/appointments.module';
 import { MedicalRecordsModule } from './medical-records/medical-records.module';
 import { BillingModule } from './billing/billing.module';
 import { NotificationsModule } from './notifications/notifications.module';
-import { UploadsModule } from './uploads/uploads.module';
+
 
 import { PrismaService } from '../prisma/prisma.service';
 import { LoggerInterceptor } from './common/interceptors/logger.interceptor';
@@ -29,7 +29,7 @@ import { LoggerInterceptor } from './common/interceptors/logger.interceptor';
     MedicalRecordsModule,
     BillingModule,
     NotificationsModule,
-    UploadsModule,
+    
   ],
   providers: [
     PrismaService,
